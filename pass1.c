@@ -36,9 +36,7 @@ int search_opcode(FILE *fp1,struct Token token)
     {
           tokenise(line2,&token2);
           if(strcmp(token2.opcode,token.opcode)==0)
-          {
               return 1;
-          }
     }
     return 0;
 }
@@ -88,7 +86,7 @@ while(fgets(line, 1000, input) != NULL)
     else
     {
         printf("Invalid Opcode at line %d\n",Line);
-        printf("%s\t%s\t%s\t\n",token.label,token.opcode,token.operands);
+        printf("%s\t%s\t%s\t\n",token.label,token.opcode,token.operands);//you can stop the program here by adding exit(0);
     }
     Line++;
     }//end of while loop
