@@ -60,7 +60,7 @@ int main()
 {
     struct Token token;
     struct Token token2;
-    int Line=1,i=0,n=0;
+    int Line=1,i=0,n=0,dup_flag=0,temp;
     FILE *input, *output,*fp1,*fp2 ,*fp3;
     char line[1000],mnemonic[1000];
     int start;
@@ -79,32 +79,9 @@ int main()
         address=0;
 while(fgets(line, 1000, input) != NULL)
     {
+       dup_flag=0;
+       temp=address;
        tokenise(line,&token);
-       fprintf(output,"%x\t%s\t%s\t%s\n",address,token.label, token.opcode, token.operands);
-       if (strcmp(token.label, "**") != 0)
-       {
-        if(search_label(token,n)==1)
-        {
-        printf("Duplicate Label found press 1 if u want to continue 0 to exit.\n");
-        int x;
-        scanf("%d",&x);
-        switch(x){
-            case 0:exit(1);
-            break;
-            case 1:goto star;
-        }
-        }
-        else
-        {
-        star:
-        fprintf(fp2, "%s\t%x\n", token.label, address);
-        sym[i].address=address;
-        strcpy(sym[i].label,token.label);
-        printf("%s\n",sym[i].label);
-        i++;
-        n=i;
-        }
-       }
        rewind(fp1);
     if(search_opcode(fp1,token))
         address+=3;
@@ -125,8 +102,36 @@ while(fgets(line, 1000, input) != NULL)
     {
         printf("Invalid Opcode at line %d\n",Line);
         printf("%s\t%s\t%s\t\n",token.label,token.opcode,token.operands);//you can stop the program here by adding exit(0);
+        dup_flag=1;
     }
     Line++;
+    if(!dup_flag){
+    fprintf(output,"%x\t%s\t%s\t%s\n",temp,token.label, token.opcode, token.operands);
+    }
+    if(strcmp(token.label, "**") != 0 && !dup_flag)
+       {
+        if(search_label(token,n)==1)
+        {
+        printf("Duplicate Label found press 1 if u want to continue 0 to exit.\n");
+        int x;
+        scanf("%d",&x);
+        switch(x){
+            case 0:exit(1);
+            break;
+            case 1:goto star;
+        }
+        }
+        else
+        {
+        star:
+        fprintf(fp2, "%s\t%x\n", token.label, temp);
+        sym[i].address=address;
+        strcpy(sym[i].label,token.label);
+        printf("%s\n",sym[i].label);
+        i++;
+        n=i;
+        }
+       }
     }//end of while loop
     fclose(input);
     fclose(output);
