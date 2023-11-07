@@ -61,7 +61,7 @@ int main()
     struct Token token;
     struct Token token2;
     int Line=1,i=0,n=0,dup_flag=0,temp;
-    FILE *input, *output,*fp1,*fp2 ,*fp3;
+    FILE *input, *output,*fp1,*fp2;
     char line[1000],mnemonic[1000];
     int start;
     input = fopen("input.txt", "r");
@@ -105,9 +105,8 @@ while(fgets(line, 1000, input) != NULL)
         dup_flag=1;
     }
     Line++;
-    if(!dup_flag){
+    if(!dup_flag)
     fprintf(output,"%x\t%s\t%s\t%s\n",temp,token.label, token.opcode, token.operands);
-    }
     if(strcmp(token.label, "**") != 0 && !dup_flag)
        {
         if(search_label(token,n)==1)
@@ -127,7 +126,6 @@ while(fgets(line, 1000, input) != NULL)
         fprintf(fp2, "%s\t%x\n", token.label, temp);
         sym[i].address=address;
         strcpy(sym[i].label,token.label);
-        printf("%s\n",sym[i].label);
         i++;
         n=i;
         }
