@@ -7,6 +7,12 @@ struct Token
     char opcode[100];
     char operands[100];
 };
+struct SymbolTable
+{
+    char label[100];
+    int address;
+};
+struct SymbolTable sym[100];
 int address;
 void tokenise(char line[1000], struct Token *token)
 {
@@ -40,12 +46,22 @@ int search_opcode(FILE *fp1,struct Token token)
     }
     return 0;
 }
+int search_label(struct Token token,int n)
+{
+    int i;
+    for(i=0;i<n;i++)
+    {
+        if(strcmp(token.label,sym[i].label)==0)
+            return 1;
+    }
+    return 0;
+}
 int main()
 {
     struct Token token;
     struct Token token2;
-    int Line=1;
-    FILE *input, *output,*fp1,*fp2;
+    int Line=1,i=0,n=0;
+    FILE *input, *output,*fp1,*fp2 ,*fp3;
     char line[1000],mnemonic[1000];
     int start;
     input = fopen("input.txt", "r");
@@ -66,7 +82,29 @@ while(fgets(line, 1000, input) != NULL)
        tokenise(line,&token);
        fprintf(output,"%x\t%s\t%s\t%s\n",address,token.label, token.opcode, token.operands);
        if (strcmp(token.label, "**") != 0)
-            fprintf(fp2, "%s\t%x\n", token.label, address);
+       {
+        if(search_label(token,n)==1)
+        {
+        printf("Duplicate Label found press 1 if u want to continue 0 to exit.\n");
+        int x;
+        scanf("%d",&x);
+        switch(x){
+            case 0:exit(1);
+            break;
+            case 1:goto star;
+        }
+        }
+        else
+        {
+        star:
+        fprintf(fp2, "%s\t%x\n", token.label, address);
+        sym[i].address=address;
+        strcpy(sym[i].label,token.label);
+        printf("%s\n",sym[i].label);
+        i++;
+        n=i;
+        }
+       }
        rewind(fp1);
     if(search_opcode(fp1,token))
         address+=3;
