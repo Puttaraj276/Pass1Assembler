@@ -84,8 +84,23 @@ while(fgets(line, 1000, input) != NULL)
        tokenise(line,&token);
        rewind(fp1);
     if(search_opcode(fp1,token)){
-        address+=3;
-        a+=3;
+        /*if(strcmp(token.opcode,"END")!=0){
+          address+=3;
+          a+=3;
+        }*/
+        int len=strlen(token.opcode);
+        if(token.opcode[len-1]=='R')
+        {
+            address+=2;
+            a+=2;
+        }
+        else
+        {
+            if(strcmp(token.opcode,"END")!=0){
+            address+=3;
+            a+=3;
+            }
+        }
     }
     else if(strcmp(token.opcode, "WORD") == 0){
             address += 3;
