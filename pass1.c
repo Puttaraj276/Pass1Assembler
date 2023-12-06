@@ -60,14 +60,14 @@ int main()
 {
     struct Token token;
     struct Token token2;
-    int Line=1,i=0,n=0,dup_flag=0,temp;
+    int Line=1,i=0,n=0,dup_flag=0,temp,a=0;
     FILE *input, *output,*fp1,*fp2;
     char line[1000],mnemonic[1000];
     int start;
-    input = fopen("input.txt", "r");
+    input = fopen("input2.txt", "r");
     fp1 = fopen("optab.txt", "r");
     fp2 = fopen("symtab.txt", "w");
-    output = fopen("output.txt", "w");
+    output = fopen("intermediate.txt", "w");
     fgets(line, 1000, input);
     tokenise(line,&token);
     if(strcmp(token.opcode, "START") == 0)
@@ -83,21 +83,37 @@ while(fgets(line, 1000, input) != NULL)
        temp=address;
        tokenise(line,&token);
        rewind(fp1);
-    if(search_opcode(fp1,token))
+    if(search_opcode(fp1,token)){
         address+=3;
-    else if(strcmp(token.opcode, "WORD") == 0)
+        a+=3;
+    }
+    else if(strcmp(token.opcode, "WORD") == 0){
             address += 3;
-    else if (strcmp(token.opcode, "RESW") == 0)
+            a+=3;
+    }
+    else if (strcmp(token.opcode, "RESW") == 0){
             address += (3 * (atoi(token.operands)));
+            a+=(3 * (atoi(token.operands)));;
+    }
     else if (strcmp(token.opcode, "BYTE") == 0)
     {
-        if(token.operands[0]=='C')
+        if(token.operands[0]=='C'){
             address+=strlen(token.operands)-3;
-        else if(token.operands[0]=='X')
+            a+=strlen(token.operands)-3;
+        }
+        else if(token.operands[0]=='X'){
             address+=(strlen(token.operands)-3)/2;
+            a+=(strlen(token.operands)-3)/2;
+        }
     }
-    else if(strcmp(token.opcode, "RESB") == 0)
+    else if(strcmp(token.opcode, "RESB") == 0){
         address += atoi(token.operands);
+        a+= atoi(token.operands);
+    }
+    else if(strcmp(token.opcode,".ORG"))
+    {
+        address=strtol(token.operands,NULL,16);
+    }
     else
     {
         printf("Invalid Opcode at line %d\n",Line);
@@ -111,7 +127,7 @@ while(fgets(line, 1000, input) != NULL)
        {
         if(search_label(token,n)==1)
         {
-        printf("Duplicate Label found press 1 if u want to continue 0 to exit.\n");
+        printf("Duplicate Label found at line %d press 1 if u want to continue 0 to exit.\n",Line);
         int x;
         scanf("%d",&x);
         switch(x){
@@ -135,7 +151,9 @@ while(fgets(line, 1000, input) != NULL)
     fclose(output);
     fclose(fp1);
     fclose(fp2);
-    int length=address-start;
-    printf("%d",length);
+    FILE *len;
+    len=fopen("length.txt","w");
+    fprintf(len,"%x",a);
+    printf("Program length is %x",a);
     return 0;
 }
