@@ -38,11 +38,14 @@ int search_opcode(FILE *fp1,struct Token token)
 {
     struct Token token2;
     char line2[1000];
+    int I_L;
     while(fgets(line2,1000,fp1)!=NULL)
     {
           tokenise(line2,&token2);
-          if(strcmp(token2.opcode,token.opcode)==0)
-              return 1;
+          if(strcmp(token2.label,token.opcode)==0){
+            I_L=atoi(token2.operands);
+              return I_L;
+          }
     }
     return 0;
 }
@@ -64,7 +67,7 @@ int main()
     FILE *input, *output,*fp1,*fp2;
     char line[1000],mnemonic[1000];
     int start;
-    input = fopen("input2.txt", "r");
+    input = fopen("input.txt", "r");
     fp1 = fopen("optab.txt", "r");
     fp2 = fopen("symtab.txt", "w");
     output = fopen("intermediate.txt", "w");
@@ -83,24 +86,9 @@ while(fgets(line, 1000, input) != NULL)
        temp=address;
        tokenise(line,&token);
        rewind(fp1);
-    if(search_opcode(fp1,token)){
-        /*if(strcmp(token.opcode,"END")!=0){
-          address+=3;
-          a+=3;
-        }*/
-        int len=strlen(token.opcode);
-        if(token.opcode[len-1]=='R')
-        {
-            address+=2;
-            a+=2;
-        }
-        else
-        {
-            if(strcmp(token.opcode,"END")!=0){
-            address+=3;
-            a+=3;
-            }
-        }
+    int I_L = search_opcode(fp1,token);
+    if(I_L){
+        address+=I_L;
     }
     else if(strcmp(token.opcode, "WORD") == 0){
             address += 3;
